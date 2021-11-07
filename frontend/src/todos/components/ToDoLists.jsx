@@ -86,7 +86,7 @@ export const ToDoLists = ({ style }) => {
           isComplete: value
         }
       });
-    }, 1000),
+    }, 500),
 		[],
 	);
 
