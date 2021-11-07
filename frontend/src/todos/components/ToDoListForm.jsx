@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { TextField, Card, CardContent, CardActions, Button, Typography} from '@material-ui/core'
+import { TextField, Card, CardContent, CardActions, Button, Typography, Checkbox } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AddIcon from '@material-ui/icons/Add'
 
@@ -25,14 +25,8 @@ const useStyles = makeStyles({
   }
 })
 
-export const ToDoListForm = ({ toDoList, saveToDoList }) => {
+export const ToDoListForm = ({ toDoList, changeStatus, createItem, updateItem, deleteItem }) => {
   const classes = useStyles()
-  const [todos, setTodos] = useState(toDoList.todos)
-
-  const handleSubmit = event => {
-    event.preventDefault()
-    saveToDoList(toDoList.id, { todos })
-  }
 
   return (
     <Card className={classes.card}>
@@ -40,51 +34,17 @@ export const ToDoListForm = ({ toDoList, saveToDoList }) => {
         <Typography component='h2'>
           {toDoList.title}
         </Typography>
-        <form onSubmit={handleSubmit} className={classes.form}>
-          {todos.map((name, index) => (
-            <div key={index} className={classes.todoLine}>
-              <Typography className={classes.standardSpace} variant='h6'>
-                {index + 1}
-              </Typography>
-              <TextField
-                label='What to do?'
-                value={name}
-                onChange={event => {
-                  setTodos([ // immutable update
-                    ...todos.slice(0, index),
-                    event.target.value,
-                    ...todos.slice(index + 1)
-                  ])
-                }}
-                className={classes.textField}
-              />
-              <Button
-                size='small'
-                color='secondary'
-                className={classes.standardSpace}
-                onClick={() => {
-                  setTodos([ // immutable delete
-                    ...todos.slice(0, index),
-                    ...todos.slice(index + 1)
-                  ])
-                }}
-              >
-                <DeleteIcon />
-              </Button>
-            </div>
+        <form className={classes.form}>
+          {toDoList.todos.map((todo, index) => (
+            <ToDoListItem key={index} index={index} oneTodo={todo} changeStatus={changeStatus} updateItem={updateItem} deleteItem={deleteItem} />
           ))}
           <CardActions>
             <Button
               type='button'
               color='primary'
-              onClick={() => {
-                setTodos([...todos, ''])
-              }}
+              onClick={createItem}
             >
               Add Todo <AddIcon />
-            </Button>
-            <Button type='submit' variant='contained' color='primary'>
-              Save
             </Button>
           </CardActions>
         </form>
@@ -92,3 +52,43 @@ export const ToDoListForm = ({ toDoList, saveToDoList }) => {
     </Card>
   )
 }
+
+export const ToDoListItem = ({ index, oneTodo, changeStatus, updateItem, deleteItem }) => {
+  const classes = useStyles()
+  const [todo, setTodo] = useState(oneTodo)
+
+  return (
+    <div className={classes.todoLine}>
+      <Checkbox
+        id={todo._id}
+        checked={todo.isComplete || false}
+        onChange={(event) => {
+          setTodo({...todo, isComplete: event.target.checked});
+          changeStatus(todo._id, event.target.checked)
+        }}
+        color='default'
+      />
+      <Typography className={classes.standardSpace} variant='h6'>
+        {index + 1}
+      </Typography>
+      <TextField
+        label='What to do?'
+        value={todo.text}
+        onChange={(event) => {
+          setTodo({...todo, text: event.target.value});
+          updateItem(todo._id, event.target.value);
+        }}
+        className={classes.textField}
+      />
+      <Button
+        size='small'
+        color='secondary'
+        className={classes.standardSpace}
+        onClick={() => deleteItem(todo._id)}
+      >
+        <DeleteIcon />
+      </Button>
+    </div>
+  )
+}
+

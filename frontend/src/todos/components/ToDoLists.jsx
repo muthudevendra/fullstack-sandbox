@@ -8,34 +8,81 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ReceiptIcon from '@material-ui/icons/Receipt'
 import Typography from '@material-ui/core/Typography'
 import { ToDoListForm } from './ToDoListForm'
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-const getPersonalTodos = () => {
-  return sleep(1000).then(() => Promise.resolve({
-    '0000000001': {
-      id: '0000000001',
-      title: 'First List',
-      todos: ['First todo of first list!']
-    },
-    '0000000002': {
-      id: '0000000002',
-      title: 'Second List',
-      todos: ['First todo of second list!']
-    }
-  }))
-}
+import client from '../../services/fetch-client'
 
 export const ToDoLists = ({ style }) => {
-  const [toDoLists, setToDoLists] = useState({})
-  const [activeList, setActiveList] = useState()
+  const [toDoLists, setToDoLists] = useState({
+    '0000000001': {
+      id: 1,
+      title: 'First List',
+      todos: []
+    },
+    '0000000002': {
+      id: 2,
+      title: 'Second List',
+      todos: []
+    }
+  });
+
+  const [activeList, setActiveList] = useState();
+  const [activeListId, setActiveListId] = useState();
 
   useEffect(() => {
-    getPersonalTodos()
-      .then(setToDoLists)
+    getPersonalTodos();
   }, [])
 
-  if (!Object.keys(toDoLists).length) return null
+  const getPersonalTodos = async () => {
+    const data = await client("todos", "GET");
+    const listOne = data.filter((item) => item.listId === 1);
+    const listTwo = data.filter((item) => item.listId === 2);
+    const modifiedData = {
+      '0000000001': {
+        id: 1,
+        title: 'First List',
+        todos: listOne
+      },
+      '0000000002': {
+        id: 2,
+        title: 'Second List',
+        todos: listTwo
+      }
+    };
+    setToDoLists(modifiedData);
+  }
+
+  const createItem = async () => {
+    await client(`/todos`, "POST", {
+      body: {
+        text: "",
+        listId: activeListId,
+        isComplete: false,
+      }
+    });
+    getPersonalTodos();
+  };
+
+  const deleteTodo = async (id) => {
+    await client(`/todo/${id}`, "DELETE");
+    getPersonalTodos();
+  };
+
+  const updateItem = async (id, value) => {
+    await client(`/todo/${id}`, "PUT", {
+      body: {
+        text: value
+      }
+    });
+
+  };
+
+  const changeStatus = async (id, value) => {
+    await client(`/todo/${id}`, "PUT", {
+      body: {
+        isComplete: value
+      }
+    });
+  };
+
   return <Fragment>
     <Card style={style}>
       <CardContent>
@@ -48,7 +95,11 @@ export const ToDoLists = ({ style }) => {
           {Object.keys(toDoLists).map((key) => <ListItem
             key={key}
             button
-            onClick={() => setActiveList(key)}
+            onClick={() => {
+              getPersonalTodos();
+              setActiveList(key);
+              setActiveListId(toDoLists[key].id)
+            }}
           >
             <ListItemIcon>
               <ReceiptIcon />
@@ -59,15 +110,12 @@ export const ToDoLists = ({ style }) => {
       </CardContent>
     </Card>
     {toDoLists[activeList] && <ToDoListForm
-      key={activeList} // use key to make React recreate component to reset internal state
+      key={activeList}
       toDoList={toDoLists[activeList]}
-      saveToDoList={(id, { todos }) => {
-        const listToUpdate = toDoLists[id]
-        setToDoLists({
-          ...toDoLists,
-          [id]: { ...listToUpdate, todos }
-        })
-      }}
+      createItem={createItem}
+      updateItem={updateItem}
+      deleteItem={deleteTodo}
+      changeStatus={changeStatus}
     />}
   </Fragment>
 }
