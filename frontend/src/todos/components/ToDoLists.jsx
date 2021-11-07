@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react'
+import React, { Fragment, useState, useEffect, useCallback } from 'react'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 import List from '@material-ui/core/List'
@@ -9,6 +9,7 @@ import ReceiptIcon from '@material-ui/icons/Receipt'
 import Typography from '@material-ui/core/Typography'
 import { ToDoListForm } from './ToDoListForm'
 import client from '../../services/fetch-client'
+import debounce from 'lodash.debounce';
 
 export const ToDoLists = ({ style }) => {
   const [toDoLists, setToDoLists] = useState({
@@ -24,6 +25,7 @@ export const ToDoLists = ({ style }) => {
     }
   });
 
+  
   const [activeList, setActiveList] = useState();
   const [activeListId, setActiveListId] = useState();
 
@@ -32,7 +34,7 @@ export const ToDoLists = ({ style }) => {
   }, [])
 
   const getPersonalTodos = async () => {
-    const data = await client("todos", "GET");
+    const data = await client("/todos", "GET");
     const listOne = data.filter((item) => item.listId === 1);
     const listTwo = data.filter((item) => item.listId === 2);
     const modifiedData = {
@@ -66,22 +68,27 @@ export const ToDoLists = ({ style }) => {
     getPersonalTodos();
   };
 
-  const updateItem = async (id, value) => {
-    await client(`/todo/${id}`, "PUT", {
-      body: {
-        text: value
-      }
-    });
+  const updateItem = useCallback(
+		debounce(async (id, value) => {
+      await client(`/todo/${id}`, "PUT", {
+        body: {
+          text: value
+        }
+      });
+    }, 1000),
+		[],
+	);
 
-  };
-
-  const changeStatus = async (id, value) => {
-    await client(`/todo/${id}`, "PUT", {
-      body: {
-        isComplete: value
-      }
-    });
-  };
+  const changeStatus = useCallback(
+		debounce(async (id, value) => {
+      await client(`/todo/${id}`, "PUT", {
+        body: {
+          isComplete: value
+        }
+      });
+    }, 1000),
+		[],
+	);
 
   return <Fragment>
     <Card style={style}>
