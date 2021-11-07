@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const uri = `mongodb+srv://sellpy:sellpy@cluster0.fcspg.mongodb.net/todo?retryWrites=true&w=majority`;
+const uri = process.env.MONGO;
 
 const options = {
   useNewUrlParser: true,
