@@ -1,11 +1,16 @@
-const express = require('express')
-const cors = require('cors')
-const app = express()
+require("./config.js");
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+var routes = require("./src/routes/todo");
 
-app.use(cors())
+const app = express();
 
-const PORT = 3001
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-app.get('/', (req, res) => res.send('Hello World!'))
+const PORT = 3001;
+routes(app);
 
-app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
+app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
