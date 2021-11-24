@@ -36,11 +36,11 @@ Below follows one main task and 4 additional tasks. Your assignment is to comple
 If you feel constrained by time (which is totally fine!), prioritize quality over quantity.
 
 ### Main Task
-Persist todos on the server. Persisting in a database is not required. (Simple js structures on the server is fine). If you do go for an actual DB (again not required), be sure to include instructions of how to get it up and running.
+Persist todos on the server. Persisting in a database is not required. (Simple js structures on the server is fine). If you do go for an actual DB (again not required), be sure to include instructions of how to get it up and running. - [Status: Complete]
 
 ### Additional tasks
-- Don't require users to press save when an item is added/edited in the todolist. (Autosave functionality)
-- Make it possible to indicate that a todo is completed.
+- Don't require users to press save when an item is added/edited in the todolist. (Autosave functionality) - [Status: Complete]
+- Make it possible to indicate that a todo is completed. - [Status: Complete]
 - Indicate that a todolist is completed if all todo items within are completed.
 - Add a date for completion to todo items. Indicate how much time is remaining or overdue.
 
