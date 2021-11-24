@@ -36,7 +36,7 @@ export const ToDoListForm = ({ toDoList, changeStatus, createItem, updateItem, d
         </Typography>
         <form className={classes.form}>
           {toDoList.todos.map((todo, index) => (
-            <ToDoListItem key={index} index={index} oneTodo={todo} changeStatus={changeStatus} updateItem={updateItem} deleteItem={deleteItem} />
+            <ToDoListItem key={todo._id} index={index} oneTodo={todo} changeStatus={changeStatus} updateItem={updateItem} deleteItem={deleteItem} />
           ))}
           <CardActions>
             <Button
@@ -63,7 +63,7 @@ export const ToDoListItem = ({ index, oneTodo, changeStatus, updateItem, deleteI
         id={todo._id}
         checked={todo.isComplete || false}
         onChange={(event) => {
-          setTodo({...todo, isComplete: event.target.checked});
+          setTodo({ ...todo, isComplete: event.target.checked });
           changeStatus(todo._id, event.target.checked)
         }}
         color='default'
@@ -75,7 +75,7 @@ export const ToDoListItem = ({ index, oneTodo, changeStatus, updateItem, deleteI
         label='What to do?'
         value={todo.text}
         onChange={(event) => {
-          setTodo({...todo, text: event.target.value});
+          setTodo({ ...todo, text: event.target.value });
           updateItem(todo._id, event.target.value);
         }}
         className={classes.textField}

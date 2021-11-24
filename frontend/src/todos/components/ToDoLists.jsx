@@ -12,7 +12,7 @@ import client from '../../services/fetch-client'
 import debounce from 'lodash.debounce';
 
 export const ToDoLists = ({ style }) => {
-  const [toDoLists, setToDoLists] = useState({
+  let [toDoLists, setToDoLists] = useState({
     1: {
       id: 1,
       title: 'First List',
@@ -25,8 +25,12 @@ export const ToDoLists = ({ style }) => {
     }
   });
 
-
+  const [todos, setTodos] = useState([]);
   const [activeList, setActiveList] = useState();
+
+  const listTwo = todos.filter((item) => item.listId === 2);
+  const listOne = todos.filter((item) => item.listId === 1);
+  toDoLists = { 1: { ...toDoLists[1], todos: listOne }, 2: { ...toDoLists[2], todos: listTwo } };
 
   useEffect(() => {
     getPersonalTodos();
@@ -34,9 +38,7 @@ export const ToDoLists = ({ style }) => {
 
   const getPersonalTodos = async () => {
     const data = await client("/todos", "GET");
-    const listOne = data.filter((item) => item.listId === 1);
-    const listTwo = data.filter((item) => item.listId === 2);
-    setToDoLists({ 1: { ...toDoLists[1], todos: listOne }, 2: { ...toDoLists[2], todos: listTwo } });
+    setTodos(data)
   }
 
   const createItem = async () => {
@@ -51,8 +53,13 @@ export const ToDoLists = ({ style }) => {
   };
 
   const deleteTodo = async (id) => {
-    await client(`/todo/${id}`, "DELETE");
-    getPersonalTodos();
+    try {
+      await client(`/todo/${id}`, "DELETE");
+      const newList = todos.filter((item) => item._id !== id);
+      setTodos(newList);
+    } catch (error) {
+      // Todo: Error snackbar show the error
+    }
   };
 
   const updateItem = useCallback(

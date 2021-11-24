@@ -26,7 +26,7 @@ async function client(endpoint, method, { body, ...customConfig } = {}) {
   try {
     return await response.json();
   } catch (err) {
-    return response;
+    throw response;
   }
 }
 
