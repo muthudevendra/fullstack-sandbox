@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { TextField, Card, CardContent, CardActions, Button, Typography, Checkbox } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AddIcon from '@material-ui/icons/Add'
+import debounce from 'lodash.debounce';
 
 const useStyles = makeStyles({
   card: {
@@ -57,6 +58,13 @@ export const ToDoListItem = ({ index, oneTodo, changeStatus, updateItem, deleteI
   const classes = useStyles()
   const [todo, setTodo] = useState(oneTodo)
 
+  const func = useCallback(
+    debounce(async (event) => {
+      updateItem(todo._id, event.target.value);
+    }, 1000),
+    []
+  );
+
   return (
     <div className={classes.todoLine}>
       <Checkbox
@@ -75,8 +83,8 @@ export const ToDoListItem = ({ index, oneTodo, changeStatus, updateItem, deleteI
         label='What to do?'
         value={todo.text}
         onChange={(event) => {
+          func(event);
           setTodo({ ...todo, text: event.target.value });
-          updateItem(todo._id, event.target.value);
         }}
         className={classes.textField}
       />

@@ -16,12 +16,12 @@ export const ToDoLists = ({ style }) => {
     1: {
       id: 1,
       title: 'First List',
-      todos: []
+      todos: [],
     },
     2: {
       id: 2,
       title: 'Second List',
-      todos: []
+      todos: [],
     }
   });
 
@@ -62,16 +62,13 @@ export const ToDoLists = ({ style }) => {
     }
   };
 
-  const updateItem = useCallback(
-    debounce(async (id, value) => {
-      await client(`/todo/${id}`, "PUT", {
-        body: {
-          text: value
-        }
-      });
-    }, 1000),
-    [],
-  );
+  const updateItem = async (id, value) => {
+    await client(`/todo/${id}`, "PUT", {
+      body: {
+        text: value
+      }
+    })
+  }
 
   const changeStatus = useCallback(
     debounce(async (id, value) => {
@@ -80,6 +77,8 @@ export const ToDoLists = ({ style }) => {
           isComplete: value
         }
       });
+      const updatedTodos = todos.map((item) => item._id === id ? ({ ...item, isComplete: value }) : item);
+      setTodos(updatedTodos);
     }, 500),
     [],
   );
@@ -104,7 +103,7 @@ export const ToDoLists = ({ style }) => {
             <ListItemIcon>
               <ReceiptIcon />
             </ListItemIcon>
-            <ListItemText primary={toDoLists[key].title} />
+            <ListItemText primary={toDoLists[key].title} secondary={toDoLists[key].todos.every(item => item.isComplete) && "DONE"} />
           </ListItem>)}
         </List>
       </CardContent>
